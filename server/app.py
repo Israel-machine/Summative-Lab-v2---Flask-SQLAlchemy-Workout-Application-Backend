@@ -3,7 +3,7 @@ import os
 sys.path.append(os.getcwd() + '/server')
 from flask import Flask,make_response, request
 from flask_migrate import Migrate
-from models import db
+from models import db, Workout, WorkoutExercise, Exercise, workouts_schema, workout_schema
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
@@ -18,7 +18,8 @@ db.init_app(app)
 @app.route('/workouts', methods=['GET', 'POST'])
 def workouts():
     if request.method == 'GET':
-        return make_response({"message": "List of all workouts placeholder"}, 200)
+        workouts = Workout.query.all()
+        return make_response(workouts_schema.dump(workouts), 200)
     elif request.method == 'POST':
         return make_response({"message": "Create workout placeholder"}, 201)
 

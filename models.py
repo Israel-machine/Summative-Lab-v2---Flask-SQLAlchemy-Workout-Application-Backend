@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import validates
+from marshmallow import Schema, fields, validate, ValidationError, validates as validates_marshmallow
 db = SQLAlchemy()
 
 # Define Models here
@@ -64,3 +65,45 @@ class WorkoutExercise(db.Model):
 
     def __repr__(self):
         return f'<WorkoutExercise Workout: {self.workout_id}, Exercise: {self.exercise_id}>'
+    
+
+class ExerciseSchema(Schema):
+    id = fields.Int(dump_only=True)
+    # Validation 1: Name must be at least 3 characters long
+    name = fields.Str(required=True, validate=validate.Length(min=3))
+    category = fields.Str(required=True)
+    equipment_needed = fields.Bool()
+
+class WorkoutSchema(Schema):
+    id = fields.Int(dump_only=True)
+    date = fields.DateTime(required=True)
+    duration_minutes = fields.Int(required=True)
+    notes = fields.Str()
+
+    # Validation 2: custom validation for duration
+    @validates_marshmallow('duration_minutes')
+    def validate_duration_schema(self, value):
+        if value < 1:
+            raise ValidationError("Duration must be at least 1 minute.")
+
+class WorkoutExerciseSchema(Schema):
+    id = fields.Int(dump_only=True)
+    workout_id = fields.Int(required=True)
+    exercise_id = fields.Int(required=True)
+    reps = fields.Int()
+    sets = fields.Int()
+    duration_seconds = fields.Int()
+
+    # Nested fields allow you to see the actual Exercise/Workout object 
+    # instead of just the ID number (helps with Step 7 stretch goals)
+    exercise = fields.Nested(ExerciseSchema, dump_only=True)
+    workout = fields.Nested(WorkoutSchema, dump_only=True)
+
+# Initialize single and collection schemas for use in app.py
+exercise_schema = ExerciseSchema()
+exercises_schema = ExerciseSchema(many=True)
+
+workout_schema = WorkoutSchema()
+workouts_schema = WorkoutSchema(many=True)
+
+workout_exercise_schema = WorkoutExerciseSchema()
