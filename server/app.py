@@ -3,7 +3,6 @@ import os
 sys.path.append(os.getcwd() + '/server')
 from flask import Flask,make_response, request
 from flask_migrate import Migrate
-# from models import db, Workout, WorkoutExercise, Exercise, workouts_schema, workout_schema
 from models import (
     db, Workout, workout_schema, workouts_schema, 
     Exercise, exercise_schema, exercises_schema,

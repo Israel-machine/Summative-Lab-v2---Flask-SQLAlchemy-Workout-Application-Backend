@@ -69,7 +69,6 @@ class WorkoutExercise(db.Model):
 
 class ExerciseSchema(Schema):
     id = fields.Int(dump_only=True)
-    # Validation 1: Name must be at least 3 characters long
     name = fields.Str(required=True, validate=validate.Length(min=3))
     category = fields.Str(required=True)
     equipment_needed = fields.Bool()
@@ -80,7 +79,6 @@ class WorkoutSchema(Schema):
     duration_minutes = fields.Int(required=True)
     notes = fields.Str()
 
-    # Validation 2: custom validation for duration
     @validates_marshmallow('duration_minutes')
     def validate_duration_schema(self, value):
         if value < 1:
@@ -94,12 +92,9 @@ class WorkoutExerciseSchema(Schema):
     sets = fields.Int()
     duration_seconds = fields.Int()
 
-    # Nested fields allow you to see the actual Exercise/Workout object 
-    # instead of just the ID number (helps with Step 7 stretch goals)
     exercise = fields.Nested(ExerciseSchema, dump_only=True)
     workout = fields.Nested(WorkoutSchema, dump_only=True)
 
-# Initialize single and collection schemas for use in app.py
 exercise_schema = ExerciseSchema()
 exercises_schema = ExerciseSchema(many=True)
 
